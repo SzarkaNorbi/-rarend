@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Órarend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Órarend</h1>
+
+    <label for="day">Nap:</label>
+    <select id="day">
+        <option value="Hétfő">Hétfő</option>
+        <option value="Kedd">Kedd</option>
+        <option value="Szerda">Szerda</option>
+        <option value="Csütörtök">Csütörtök</option>
+        <option value="Péntek">Péntek</option>
+    </select>
+
+    <label for="time">Időpont:</label>
+    <input type="text" id="time" placeholder="Pl.: 08:00-09:00">
+
+    <label for="subject">Tantárgy:</label>
+    <input type="text" id="subject" placeholder="Pl.: Matematika">
+
+    <button onclick="addLesson()">Óra hozzáadása</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Időpont</th>
+                <th>Hétfő</th>
+                <th>Kedd</th>
+                <th>Szerda</th>
+                <th>Csütörtök</th>
+                <th>Péntek</th>
+            </tr>
+        </thead>
+        <tbody id="schedule-body">
+            <!-- Dinamikusan töltött sorok -->
+        </tbody>
+    </table>
+
+    <script>
+        const schedule = {};
+
+        function addLesson() {
+            const day = document.getElementById('day').value;
+            const time = document.getElementById('time').value;
+            const subject = document.getElementById('subject').value;
+
+            if (!time || !subject) {
+                alert('Kérlek, töltsd ki az időpontot és a tantárgyat!');
+                return;
+            }
+
+            if (!schedule[time]) {
+                schedule[time] = { "Hétfő": "", "Kedd": "", "Szerda": "", "Csütörtök": "", "Péntek": "" };
+            }
+
+            schedule[time][day] = subject;
+
+            renderSchedule();
+        }
+
+        function deleteLesson(time, day) {
+            if (schedule[time]) {
+                schedule[time][day] = "";
+                renderSchedule();
+            }
+        }
+
+        function renderSchedule() {
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+
+            Object.keys(schedule).sort().forEach(time => {
+                const row = document.createElement('tr');
+
+                const timeCell = document.createElement('td');
+                timeCell.textContent = time;
+                row.appendChild(timeCell);
+
+                ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"].forEach(day => {
+                    const cell = document.createElement('td');
+                    if (schedule[time][day]) {
+                        cell.textContent = schedule[time][day];
+                        cell.style.cursor = 'pointer';
+                        cell.title = 'Kattints a törléshez';
+                        cell.onclick = () => deleteLesson(time, day);
+                    }
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
